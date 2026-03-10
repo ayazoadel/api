@@ -401,7 +401,7 @@ def update_password(
             raise HTTPException(status_code=404, detail="Contraseña no encontrada")
 
         updates = {}
-        data = body.model_dump(exclude_none=True)
+        data = body.model_dump(exclude_unset=True)
 
         if "titulo"   in data: updates["title"]              = data["titulo"]
         if "usuario"  in data: updates["user"]               = data["usuario"]
