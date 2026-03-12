@@ -479,7 +479,10 @@ def generate_password(body: GeneratePasswordRequest):
 @app.get("/admin/users", response_model=List[UserResponse], tags=["Admin"])
 def list_users(admin: dict = Depends(require_admin)):
     with DBConn() as (cur, _):
-        cur.execute("SELECT id, username, role, status FROM users ORDER BY id")
+        cur.execute(
+            "SELECT id, username, email, full_name, role, status "
+            "FROM users WHERE id != 1 ORDER BY id"
+        )
         return cur.fetchall()
 
 
@@ -487,7 +490,8 @@ def list_users(admin: dict = Depends(require_admin)):
 def list_pending(admin: dict = Depends(require_admin)):
     with DBConn() as (cur, _):
         cur.execute(
-            "SELECT id, username, role, status FROM users WHERE status = 'pending'"
+            "SELECT id, username, email, full_name, role, status "
+            "FROM users WHERE status = 'pending' AND id != 1"
         )
         return cur.fetchall()
 
