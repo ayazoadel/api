@@ -69,7 +69,6 @@ def login(body: LoginRequest):
 
 @app.post("/auth/register", status_code=201, tags=["Auth"])
 def register(body: RegisterRequest):
-    """Solicitud de nuevo usuario — queda en estado 'pending'."""
     if len(body.username) < 3:
         raise HTTPException(status_code=400, detail="Usuario debe tener al menos 3 caracteres")
     if len(body.password) < 6:
@@ -83,9 +82,9 @@ def register(body: RegisterRequest):
         hashed = hash_password(body.password)
         salt   = generate_salt()
         cur.execute(
-            "INSERT INTO users (username, password_hash, salt, role, status) "
-            "VALUES (%s, %s, %s, 'user', 'pending')",
-            (body.username, hashed, salt)
+            "INSERT INTO users (username, email, full_name, password_hash, salt, role, status) "
+            "VALUES (%s, %s, %s, %s, %s, 'user', 'pending')",
+            (body.username, body.email, body.full_name, hashed, salt)
         )
         conn.commit()
 
