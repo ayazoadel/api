@@ -98,10 +98,12 @@ class PasswordListItem(BaseModel):
 
 # ── ADMIN ─────────────────────────────────────────────────────
 class UserResponse(BaseModel):
-    id:       int
+    id: int
     username: str
-    role:     str
-    status:   str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    role: str
+    status: str
 
 class UpdateUserStatus(BaseModel):
     status: str   # active | pending | rejected
