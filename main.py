@@ -144,7 +144,7 @@ def get_me(current_user: dict = Depends(get_current_user)):
     user_id = int(current_user["sub"])
     with DBConn() as (cur, _):
         cur.execute(
-            "SELECT id, username,email, fill_name, role, status FROM users WHERE id = %s", (user_id,)
+            "SELECT id, username, email, fill_name, role, status FROM users WHERE id = %s", (user_id,)
         )
         user = cur.fetchone()
     if not user:
