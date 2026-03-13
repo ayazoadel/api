@@ -506,20 +506,24 @@ def update_user_status(
         raise HTTPException(status_code=400, detail="Status inválido")
 
     with DBConn() as (cur, conn):
+        # Obtener username del usuario afectado
+        cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+        target = cur.fetchone()
+        if not target:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
         cur.execute(
             "UPDATE users SET status = %s WHERE id = %s",
             (body.status, user_id)
         )
         conn.commit()
-        if cur.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
         try:
             cur.execute(
                 "INSERT INTO user_audit_log "
                 "(admin_id, admin_username, target_user_id, target_username, action, new_value) "
-                "VALUES (%s, %s, %s, (SELECT username FROM users WHERE id=%s), %s, %s)",
-                (int(admin["sub"]), admin["username"], user_id, user_id, "change_status", body.status)
+                "VALUES (%s, %s, %s, %s, %s, %s)",
+                (int(admin["sub"]), admin["username"], user_id, target["username"], "change_status", body.status)
             )
             conn.commit()
         except Exception as e:
