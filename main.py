@@ -497,36 +497,35 @@ def list_pending(admin: dict = Depends(require_admin)):
 
 
 @app.put("/admin/users/{user_id}/status", tags=["Admin"])
-  def update_user_status(
-      user_id: int,
-      body: UpdateUserStatus,
-      admin: dict = Depends(require_admin)
-  ):
-      if body.status not in ("active", "pending", "rejected", "inactive"):
-          raise HTTPException(status_code=400, detail="Status inválido")
-  
-      with DBConn() as (cur, conn):
-          cur.execute(
-              "UPDATE users SET status = %s WHERE id = %s",
-              (body.status, user_id)
-          )
-          conn.commit()
-          if cur.rowcount == 0:
-              raise HTTPException(status_code=404, detail="Usuario no encontrado")
-  
-          try:
-              cur.execute(
-                  "INSERT INTO user_audit_log "
-                  "(admin_id, admin_username, target_user_id, target_username, action, new_value) "
-                  "VALUES (%s, %s, %s, (SELECT username FROM users WHERE id=%s), %s, %s)",
-                  (int(admin["sub"]), admin["username"], user_id, user_id, "change_status", body.status)
-              )
-              conn.commit()
-          except Exception as e:
-              print(f"[AUDIT ERROR]: {e}")
-  
-      return {"message": f"Status actualizado a {body.status}"}
+def update_user_status(
+    user_id: int,
+    body: UpdateUserStatus,
+    admin: dict = Depends(require_admin)
+):
+    if body.status not in ("active", "pending", "rejected", "inactive"):
+        raise HTTPException(status_code=400, detail="Status inválido")
 
+    with DBConn() as (cur, conn):
+        cur.execute(
+            "UPDATE users SET status = %s WHERE id = %s",
+            (body.status, user_id)
+        )
+        conn.commit()
+        if cur.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+        try:
+            cur.execute(
+                "INSERT INTO user_audit_log "
+                "(admin_id, admin_username, target_user_id, target_username, action, new_value) "
+                "VALUES (%s, %s, %s, (SELECT username FROM users WHERE id=%s), %s, %s)",
+                (int(admin["sub"]), admin["username"], user_id, user_id, "change_status", body.status)
+            )
+            conn.commit()
+        except Exception as e:
+            print(f"[AUDIT ERROR]: {e}")
+
+    return {"message": f"Status actualizado a {body.status}"}
 
 @app.put("/admin/users/{user_id}/role", tags=["Admin"])
 def update_user_role(
