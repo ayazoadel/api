@@ -565,7 +565,7 @@ def delete_user(user_id: int, admin: dict = Depends(require_admin)):
             conn.commit()
             if cur.rowcount == 0:
                 raise HTTPException(status_code=404, detail="Usuario no encontrado")
-            return {"message": "Usuario eliminado correctamente"}:
+            return {"message": "Usuario eliminado correctamente"}
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
 
