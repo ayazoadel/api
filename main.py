@@ -502,7 +502,7 @@ def update_user_status(
     body: UpdateUserStatus,
     admin: dict = Depends(require_admin)
 ):
-    if body.status not in ("active", "pending", "rejected"):
+    if body.status not in ("active", "pending", "rejected", "inactive"):
         raise HTTPException(status_code=400, detail="Status inválido")
 
     with DBConn() as (cur, conn):
