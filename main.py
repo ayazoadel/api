@@ -546,16 +546,26 @@ def update_user_role(
     return {"message": f"Rol actualizado a {body.role}"}
 
 
-@app.delete("/admin/users/{user_id}", status_code=204, tags=["Admin"])
+@app.delete("/admin/users/{user_id}", status_code=200, tags=["Admin"])
 def delete_user(user_id: int, admin: dict = Depends(require_admin)):
     admin_id = int(admin["sub"])
     if user_id == admin_id:
         raise HTTPException(status_code=400, detail="No podés eliminar tu propia cuenta")
 
     with DBConn() as (cur, conn):
-        cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
-        conn.commit()
-        if cur.rowcount == 0:
+        cur.execute("SELECT COUNT(*) as total FROM passwords WHERE user_id = %s", (user_id,))
+        result = cur.fetchone()
+
+        if result["total"] > 0:
+            cur.execute("UPDATE users SET status = 'inactive' WHERE id = %s", (user_id,))
+            conn.commit()
+            return {"message": f"Usuario desactivado (tiene {result['total']} contraseña(s) guardada(s))"}
+        else:
+            cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+            conn.commit()
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Usuario no encontrado")
+            return {"message": "Usuario eliminado correctamente"}:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
 
