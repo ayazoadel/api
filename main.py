@@ -590,7 +590,7 @@ def get_audit_log(limit: int = 100, admin: dict = Depends(require_admin)):
 @app.get("/version", tags=["Utilidades"])
 def get_version():
     return {
-        "mobile": "1.0.1",
+        "mobile": "1.0.2",
         "desktop": "1.0.0"
     }
 
