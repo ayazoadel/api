@@ -580,7 +580,7 @@ def get_audit_log(limit: int = 100, admin: dict = Depends(require_admin)):
         cur.execute(
             "SELECT id, admin_username, target_username, action, "
             "old_value, new_value, "
-            "DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as created_at "
+            "DATE_FORMAT(created_at, '%%Y-%%m-%%d %%H:%%i:%%s') as created_at "
             "FROM user_audit_log ORDER BY created_at DESC LIMIT %s",
             (limit,)
         )
