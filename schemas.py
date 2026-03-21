@@ -118,7 +118,7 @@ class AuditLogResponse(BaseModel):
     action:          str
     old_value:       Optional[str]
     new_value:       Optional[str]
-    created_at:      datetime
+    created_at:      str
 
 
 # ── GENERADOR ─────────────────────────────────────────────────
