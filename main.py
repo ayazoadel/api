@@ -573,19 +573,16 @@ def delete_user(user_id: int, admin: dict = Depends(require_admin)):
             return {"message": "Usuario eliminado correctamente"}
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-
 @app.get("/admin/audit-log", response_model=List[AuditLogResponse], tags=["Admin"])
 def get_audit_log(limit: int = 100, admin: dict = Depends(require_admin)):
     with DBConn() as (cur, _):
         cur.execute(
             "SELECT id, admin_username, target_username, action, "
-            "old_value, new_value, "
-            "DATE_FORMAT(created_at, '%%Y-%%m-%%d %%H:%%i:%%s') as created_at "
+            "old_value, new_value, created_at "
             "FROM user_audit_log ORDER BY created_at DESC LIMIT %s",
             (limit,)
         )
         return cur.fetchall()
-
 
 @app.get("/version", tags=["Utilidades"])
 def get_version():
