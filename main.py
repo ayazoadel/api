@@ -578,7 +578,8 @@ def get_audit_log(limit: int = 100, admin: dict = Depends(require_admin)):
     with DBConn() as (cur, _):
         cur.execute(
             "SELECT id, admin_username, target_username, action, "
-            "old_value, new_value, created_at "
+            "old_value, new_value, "
+            "CAST(created_at AS CHAR) as created_at "
             "FROM user_audit_log ORDER BY created_at DESC LIMIT %s",
             (limit,)
         )
